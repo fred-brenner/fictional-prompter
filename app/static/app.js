@@ -32,7 +32,16 @@ async function init() {
   state.tools = boot.tools;
   state.defaults = boot.defaults;
 
-  $("#model").value = boot.defaults.model;
+  const modelSel = $("#model");
+  modelSel.innerHTML = "";
+  for (const m of boot.models || []) {
+    const o = document.createElement("option");
+    o.value = m.slug;
+    o.textContent = m.label;
+    o.title = m.slug;
+    modelSel.appendChild(o);
+  }
+  modelSel.value = boot.defaults.model;
   $("#effort").value = boot.defaults.effort;
   const cs = $("#codex-status");
   if (boot.codex.available) {

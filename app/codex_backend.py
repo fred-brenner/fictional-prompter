@@ -18,6 +18,20 @@ from pathlib import Path
 DEFAULT_MODEL = "gpt-6-luna"
 DEFAULT_EFFORT = "low"
 
+# Models the ChatGPT-account codex backend accepts (from ~/.codex/models_cache
+# + probing). Older API slugs (gpt-5, gpt-5.4-mini, o3, ...) are rejected.
+MODELS = [
+    {"slug": "gpt-6-luna", "label": "GPT-6 Luna — small/fast (default)"},
+    {"slug": "gpt-5.6-luna", "label": "GPT-5.6 Luna — prev-gen small"},
+    {"slug": "gpt-5.6-terra", "label": "GPT-5.6 Terra"},
+    {"slug": "gpt-5.6-sol", "label": "GPT-5.6 Sol"},
+    {"slug": "gpt-6-sol", "label": "GPT-6 Sol"},
+    {"slug": "gpt-6.1-sol", "label": "GPT-6.1 Sol"},
+    {"slug": "gpt-6-astra", "label": "GPT-6 Astra — largest"},
+    {"slug": "gpt-reserve", "label": "GPT Reserve — hidden catalog model"},
+    {"slug": "codex-auto-review", "label": "Codex Auto Review — review-tuned"},
+]
+
 # Judge schema: structured final response so grading is machine-readable.
 JUDGE_SCHEMA = {
     "type": "object",

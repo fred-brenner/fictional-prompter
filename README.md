@@ -4,7 +4,7 @@ An eval workbench for iterating on production prompts, modeled on the tool demoe
 [*The prompting playbook*](https://www.youtube.com/watch?v=G2B0YWuJUgI) (Code with Claude).
 
 You maintain a customer-support-bot prompt for the fictional telco **Meridian Mobile**,
-run it against a 5-case eval suite (control / edge / boundary), and fix the failure
+run it against a 10-case eval suite (control / edge / boundary), and fix the failure
 modes one by one — the same arc as the talk:
 
 | Preset | What changes |
@@ -17,10 +17,15 @@ modes one by one — the same arc as the talk:
 
 The eval suite covers the three case types from the talk:
 
-- **control** — a question that should always pass (Basic plan data limit)
-- **edge** — proration math and a policy question
-- **boundary** — a billing error that must escalate, and a legacy-plan customer
-  whose real hotspot allowance the bot tends to withhold
+- **control** (1) — a question that should always pass (Basic plan data limit)
+- **edge** (5) — proration math both directions, EU roaming, current-plan
+  hotspot, and a plan-fit recommendation requiring account-context reasoning
+- **boundary** (4) — an ambiguous charge that must escalate, a plan-switch
+  request, a legacy-plan customer whose real allowance gets withheld, and an
+  off-topic request to decline
+
+The judge is deliberately strict: partial answers, hedging, deflection to links,
+and anything the criteria forbids are all fails — when in doubt, fail.
 
 Grading is done by an LLM judge, like the talk's first scenario.
 

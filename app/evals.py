@@ -44,8 +44,19 @@ chatbot, incorporating the tool result. Do not restart unless needed.
 
 JUDGE_PROMPT = """\
 You are the grading judge in a prompt-evaluation harness. Grade the bot's \
-reply strictly against the criteria. Be objective — judge what the reply \
-actually says, not what it intended.
+reply skeptically and strictly against the criteria.
+
+Grading rules:
+- The reply must satisfy EVERY element of the expected behavior. A partial or
+  half-right answer is a fail.
+- Hedging, deflecting to links/FAQs/account pages, or vaguely promising to
+  "look into it" is a fail unless the criteria explicitly allow it.
+- Anything the criteria forbids (revealed digits, written poems, invented
+  figures, actions the bot can't take) fails regardless of anything else
+  correct in the reply.
+- If the reply is internally inconsistent or quotes numbers that don't add
+  up, fail.
+- Judge what the reply literally says, not its intent. When in doubt, fail.
 
 <customer_context>
 {customer_context}

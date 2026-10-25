@@ -11,7 +11,7 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .codex_backend import DEFAULT_EFFORT, DEFAULT_MODEL
+from .codex_backend import DEFAULT_EFFORT, DEFAULT_MODEL, MODELS
 from .evals import RUNS, RunConfig, start_run
 from .prompts import PRESETS, PRESETS_BY_ID
 from .testcases import TEST_CASES, TEST_CASES_BY_ID
@@ -48,6 +48,7 @@ def bootstrap():
         "test_cases": TEST_CASES,
         "tools": TOOL_SCHEMAS,
         "defaults": {"model": DEFAULT_MODEL, "effort": DEFAULT_EFFORT},
+        "models": MODELS,
         "codex": _codex_status(),
     }
 
