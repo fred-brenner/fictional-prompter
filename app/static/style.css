@@ -1,0 +1,127 @@
+:root {
+  --bg: #0f1115;
+  --panel: #161a22;
+  --panel2: #1c212c;
+  --border: #2a3140;
+  --text: #d7dde8;
+  --muted: #8a93a6;
+  --accent: #d97757;
+  --pass: #3fb96f;
+  --fail: #e05b5b;
+  --running: #d9a557;
+  --mono: "SF Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 18px; border-bottom: 1px solid var(--border);
+  background: var(--panel); position: sticky; top: 0; z-index: 5;
+}
+.brand h1 { font-size: 17px; margin: 0; display: inline; }
+.subtitle { color: var(--muted); margin-left: 10px; font-size: 12px; }
+.header-controls { display: flex; gap: 12px; align-items: center; font-size: 12px; color: var(--muted); }
+.header-controls input, .header-controls select {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 5px; padding: 3px 6px; font-size: 12px;
+}
+
+button {
+  background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 6px; padding: 5px 12px; cursor: pointer; font-size: 12px;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #1a120c; font-weight: 600; }
+button:disabled { opacity: .45; cursor: default; }
+
+main { display: grid; grid-template-columns: minmax(380px, 5fr) minmax(380px, 6fr); gap: 14px; padding: 14px 18px; }
+section { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; }
+.pane-head { display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 6px; }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 0 0 8px; }
+.hint { font-size: 11px; color: var(--muted); }
+
+.preset-row { display: flex; gap: 5px; flex-wrap: wrap; }
+.preset-row button { padding: 3px 9px; font-size: 11px; }
+.preset-row button.active { border-color: var(--accent); color: var(--accent); }
+
+.harness-row { display: flex; gap: 16px; align-items: center; font-size: 12px; color: var(--muted); margin: 8px 0; flex-wrap: wrap; }
+.harness-row input[type=text], .harness-row input:not([type]), .harness-row select {
+  background: var(--panel2); border: 1px solid var(--border); color: var(--text);
+  border-radius: 5px; padding: 2px 6px; font-size: 12px;
+}
+
+#prompt-editor {
+  width: 100%; min-height: 62vh; resize: vertical;
+  background: var(--panel2); color: var(--text); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px; font: 12.5px/1.55 var(--mono);
+  white-space: pre; tab-size: 2;
+}
+#prompt-editor:focus { outline: none; border-color: var(--accent); }
+
+#diff-view { max-height: 62vh; overflow: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--panel2); font: 12px/1.5 var(--mono); padding: 8px 0; }
+#diff-view .line { padding: 0 12px; white-space: pre-wrap; }
+#diff-view .add { background: rgba(63,185,111,.13); color: #9fe3bc; }
+#diff-view .del { background: rgba(224,91,91,.12); color: #f0a8a8; }
+#diff-view .same { color: var(--muted); }
+.hidden { display: none !important; }
+
+.case { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 8px; background: var(--panel2); }
+.case summary {
+  display: flex; align-items: center; gap: 10px; padding: 9px 12px;
+  cursor: pointer; list-style: none; user-select: none;
+}
+.case summary::-webkit-details-marker { display: none; }
+.case[open] summary { border-bottom: 1px solid var(--border); }
+.case-name { font-weight: 600; font-size: 13px; }
+.chip { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; padding: 1px 7px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); }
+.chip.control { color: #7cc4ff; border-color: #33507a; }
+.chip.edge { color: #d9a557; border-color: #6b5326; }
+.chip.boundary { color: #c58aff; border-color: #5c3d85; }
+
+.status-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--border); flex: none; }
+.status-dot.running { background: var(--running); animation: pulse 1s infinite alternate; }
+.status-dot.pass { background: var(--pass); }
+.status-dot.fail { background: var(--fail); }
+.status-dot.error { background: #888; }
+@keyframes pulse { from { opacity: .4; } to { opacity: 1; } }
+
+.verdict { font-weight: 700; font-size: 12px; margin-left: auto; }
+.verdict.pass { color: var(--pass); }
+.verdict.fail { color: var(--fail); }
+.meta { color: var(--muted); font-size: 11px; min-width: 110px; text-align: right; }
+.rerun { padding: 1px 7px; font-size: 12px; }
+
+.case-body { display: grid; grid-template-columns: 1fr 1.4fr; gap: 14px; padding: 12px; }
+.case-body h4 { margin: 8px 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+.case-body h4:first-child { margin-top: 0; }
+.case-body pre, .case-body .rationale, .toolcall {
+  background: var(--panel); border: 1px solid var(--border); border-radius: 6px;
+  padding: 8px 10px; font: 12px/1.5 var(--mono); white-space: pre-wrap;
+  word-break: break-word; margin: 0 0 6px;
+}
+.rationale { font-family: inherit; }
+.toolcall { color: #7cc4ff; }
+.toolcall .tname { color: var(--accent); }
+
+.badge { font-size: 11px; padding: 2px 8px; border-radius: 10px; border: 1px solid var(--border); color: var(--muted); }
+.badge.ok { color: var(--pass); border-color: var(--pass); }
+.badge.bad { color: var(--fail); border-color: var(--fail); }
+#eval-score { margin-left: 8px; font-size: 12px; text-transform: none; }
+
+#history { margin: 0 18px 24px; }
+#history table { width: 100%; border-collapse: collapse; font-size: 12px; }
+#history th, #history td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--border); }
+#history th { color: var(--muted); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .05em; }
+#history td.result-pass { color: var(--pass); font-weight: 600; }
+#history td.result-fail { color: var(--fail); font-weight: 600; }
+#history tr { cursor: pointer; }
+#history tr:hover td { background: var(--panel2); }
+
+.case.error .case-body .output { color: var(--fail); }

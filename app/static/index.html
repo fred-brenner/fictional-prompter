@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Prompt Playbook — Meridian Mobile</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <h1>Prompt Playbook</h1>
+    <span class="subtitle">Meridian Mobile · prompt eval workbench</span>
+  </div>
+  <div class="header-controls">
+    <span id="codex-status" class="badge muted">codex: checking…</span>
+    <label>model <input id="model" list="models" size="14">
+      <datalist id="models">
+        <option value="gpt-6-luna"></option>
+        <option value="gpt-5.6-luna"></option>
+        <option value="gpt-6.1-sol"></option>
+        <option value="gpt-6-astra"></option>
+      </datalist>
+    </label>
+    <label>effort
+      <select id="effort">
+        <option selected>low</option><option>medium</option>
+        <option>high</option><option>xhigh</option>
+      </select>
+    </label>
+    <button id="run-all" class="primary">Run evals</button>
+  </div>
+</header>
+
+<main>
+  <section id="prompt-pane">
+    <div class="pane-head">
+      <h2>System prompt</h2>
+      <div class="preset-row" id="presets"></div>
+    </div>
+    <div class="harness-row">
+      <label><input type="checkbox" id="tools-enabled"> calculate_proration tool</label>
+      <label>stop seq <input id="stop-seqs" size="18" placeholder="comma-separated"></label>
+      <label>diff vs
+        <select id="diff-preset"><option value="">—</option></select>
+      </label>
+    </div>
+    <textarea id="prompt-editor" spellcheck="false"></textarea>
+    <div id="diff-view" class="hidden"></div>
+  </section>
+
+  <section id="eval-pane">
+    <div class="pane-head">
+      <h2>Eval suite <span id="eval-score" class="badge"></span></h2>
+      <span class="hint">control · edge · boundary — graded by LLM judge</span>
+    </div>
+    <div id="cases"></div>
+  </section>
+</main>
+
+<section id="history">
+  <h2>Run history</h2>
+  <table>
+    <thead><tr><th>run</th><th>prompt</th><th>model</th><th>result</th><th>tokens</th><th>est. cost</th><th>duration</th><th>status</th><th>started</th></tr></thead>
+    <tbody id="run-rows"></tbody>
+  </table>
+</section>
+
+<template id="case-tpl">
+  <details class="case">
+    <summary>
+      <span class="status-dot"></span>
+      <span class="case-name"></span>
+      <span class="chip"></span>
+      <span class="verdict"></span>
+      <span class="meta"></span>
+      <button class="rerun" title="re-run this case">↻</button>
+    </summary>
+    <div class="case-body">
+      <div class="col"><h4>Customer message</h4><pre class="user-msg"></pre>
+        <h4>Account context</h4><pre class="ctx"></pre></div>
+      <div class="col"><h4>Bot reply</h4><pre class="output"></pre>
+        <div class="toolcalls"></div>
+        <h4>Judge</h4><div class="rationale"></div></div>
+    </div>
+  </details>
+</template>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
