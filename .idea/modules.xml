@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/fictional-prompter.iml" filepath="$PROJECT_DIR$/.idea/fictional-prompter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/gguf.iml" filepath="$PROJECT_DIR$/.idea/gguf.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/llama-cpp-scripts.iml" filepath="$PROJECT_DIR$/.idea/llama-cpp-scripts.iml" />
     </modules>
   </component>
 </project>

@@ -16,6 +16,13 @@ PRICES = {
     "gpt-5.6-terra": {"input": 2.00, "cached": 0.20, "output": 12.00},
     "gpt-5.5": {"input": 5.00, "cached": 0.50, "output": 30.00},
     "gpt-5.4": {"input": 2.50, "cached": 0.25, "output": 15.00},
+    # Not API prices — reference rates for open models hosted at inference
+    # providers (Together/Fireworks/OpenRouter ~$0.2/$0.6 for ~20B, ~$0.1/$0.3
+    # for ~9B class).
+    "local-gemma-4-19b": {"input": 0.20, "cached": 0.04, "output": 0.60},
+    "local-qwen3.5-9b": {"input": 0.10, "cached": 0.02, "output": 0.30},
+    # 1-bit quant of the 19B — priced like a smaller effective model
+    "local-gemma-4-19b-iq1": {"input": 0.10, "cached": 0.02, "output": 0.30},
 }
 
 

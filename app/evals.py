@@ -15,7 +15,7 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
-from .codex_backend import JUDGE_SCHEMA, run_codex
+from .codex_backend import JUDGE_SCHEMA, run_model
 from .pricing import estimate_cost
 from .tools import execute_tool, extract_tool_call
 
@@ -94,8 +94,8 @@ class RunConfig:
     effort: str
     tools_enabled: bool = True
     stop_sequences: list[str] = field(default_factory=list)
-    judge_model: str | None = None  # falls back to `model`
-    judge_effort: str = "low"
+    judge_model: str | None = "gpt-6-luna"  # None falls back to `model`
+    judge_effort: str = "medium"
 
 
 @dataclass
@@ -177,7 +177,7 @@ def _extract_reply(text: str) -> str:
 
 
 async def _bot_call(prompt: str, config: RunConfig):
-    return await run_codex(prompt, model=config.model, effort=config.effort)
+    return await run_model(prompt, model=config.model, effort=config.effort)
 
 
 async def _judge(case: dict, reply: str, tool_calls: list[dict], config: RunConfig):
@@ -189,7 +189,7 @@ async def _judge(case: dict, reply: str, tool_calls: list[dict], config: RunConf
         bot_reply=reply or "(no reply produced)",
         tool_calls=json.dumps(tool_calls) if tool_calls else "(none)",
     )
-    res = await run_codex(
+    res = await run_model(
         prompt,
         model=config.judge_model or config.model,
         effort=config.judge_effort,
@@ -197,14 +197,28 @@ async def _judge(case: dict, reply: str, tool_calls: list[dict], config: RunConf
     )
     if res.error:
         return {"verdict": None, "rationale": f"judge error: {res.error}"}, res
-    try:
-        parsed = json.loads(res.text)
-        return {
-            "verdict": parsed.get("verdict"),
-            "rationale": parsed.get("rationale", ""),
-        }, res
-    except json.JSONDecodeError:
+    parsed = _extract_json(res.text)
+    if parsed is None:
         return {"verdict": None, "rationale": f"judge returned non-JSON: {res.text[:300]}"}, res
+    return {
+        "verdict": parsed.get("verdict"),
+        "rationale": parsed.get("rationale", ""),
+    }, res
+
+
+def _extract_json(text: str) -> dict | None:
+    """Lenient JSON extraction — local models may wrap the object in prose."""
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError:
+        pass
+    m = re.search(r"\{[^{}]*\"verdict\"[^{}]*\}", text, re.DOTALL)
+    if m:
+        try:
+            return json.loads(m.group(0))
+        except json.JSONDecodeError:
+            return None
+    return None
 
 
 async def run_case(case: dict, template: str, config: RunConfig) -> CaseResult:

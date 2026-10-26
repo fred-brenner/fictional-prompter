@@ -10,7 +10,10 @@
 <header>
   <div class="brand">
     <h1>Prompt Playbook</h1>
-    <span class="subtitle">Meridian Mobile · prompt eval workbench</span>
+    <nav class="tabs">
+      <button class="tab active" data-tab="prompt">Prompt workbench</button>
+      <button class="tab" data-tab="sched">Scheduler lab</button>
+    </nav>
   </div>
   <div class="header-controls">
     <span id="codex-status" class="badge muted">codex: checking…</span>
@@ -25,6 +28,7 @@
   </div>
 </header>
 
+<div id="tab-prompt">
 <main>
   <section id="prompt-pane">
     <div class="pane-head">
@@ -58,6 +62,55 @@
     <tbody id="run-rows"></tbody>
   </table>
 </section>
+</div>
+
+<!-- ======================================================== scheduler lab -->
+<div id="tab-sched" class="hidden">
+<main class="sched-grid">
+  <section id="sched-problem">
+    <div class="pane-head"><h2>Problem</h2><span class="hint">week rota · hard rules graded in Python</span></div>
+    <h4>Employees &amp; availability</h4>
+    <table class="mini" id="emp-table"></table>
+    <h4>Shifts to fill</h4>
+    <table class="mini sched-grid-table" id="shift-table"></table>
+    <h4>Hard rules</h4>
+    <ol class="rules" id="rules-list"></ol>
+  </section>
+
+  <section id="sched-config">
+    <div class="pane-head"><h2>Approach</h2><span class="hint">model × prompt × harness</span></div>
+    <div id="approaches"></div>
+    <div class="harness-row">
+      <label>trials <input id="trials" type="number" min="1" max="8" value="3" size="3"></label>
+      <label>model <select id="sched-model"></select></label>
+      <label>effort
+        <select id="sched-effort">
+          <option>low</option><option>medium</option><option>high</option><option>xhigh</option>
+        </select>
+      </label>
+      <button id="sched-run" class="primary">Run trials</button>
+    </div>
+    <label class="soft-label">soft constraints <span class="hint">(injected into the evaluator at runtime, not the grader)</span>
+      <textarea id="soft-constraints" rows="2" placeholder="e.g. Harry doesn't like working with Sally — keep them on separate shifts where possible"></textarea>
+    </label>
+    <details class="prompt-preview">
+      <summary>Prompt for selected approach</summary>
+      <textarea id="sched-prompt-preview" spellcheck="false"></textarea>
+    </details>
+
+    <div class="pane-head" style="margin-top:14px"><h2>Trials <span id="sched-score" class="badge"></span></h2></div>
+    <div id="trial-cards"></div>
+  </section>
+</main>
+
+<section id="sched-history">
+  <h2>Run history</h2>
+  <table>
+    <thead><tr><th>run</th><th>approach</th><th>model</th><th>trials passed</th><th>violations</th><th>tokens</th><th>est. cost</th><th>duration</th><th>status</th><th>started</th></tr></thead>
+    <tbody id="sched-run-rows"></tbody>
+  </table>
+</section>
+</div>
 
 <template id="case-tpl">
   <details class="case">
@@ -80,5 +133,6 @@
 </template>
 
 <script src="/static/app.js"></script>
+<script src="/static/sched.js"></script>
 </body>
 </html>

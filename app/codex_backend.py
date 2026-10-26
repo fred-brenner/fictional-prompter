@@ -30,6 +30,21 @@ MODELS = [
     {"slug": "gpt-6-astra", "label": "GPT-6 Astra — largest"},
     {"slug": "gpt-reserve", "label": "GPT Reserve — hidden catalog model"},
     {"slug": "codex-auto-review", "label": "Codex Auto Review — review-tuned"},
+    {
+        "slug": "local-qwen3.5-9b",
+        "label": "Qwen 3.5 9B — local GGUF via red_halo",
+        "local": True,
+    },
+    {
+        "slug": "local-gemma-4-19b-iq1",
+        "label": "Gemma 4 19B IQ1 — local GGUF via red_halo",
+        "local": True,
+    },
+    {
+        "slug": "local-gemma-4-19b",
+        "label": "Gemma 4 19B — local GGUF via red_halo",
+        "local": True,
+    },
 ]
 
 # Judge schema: structured final response so grading is machine-readable.
@@ -172,3 +187,31 @@ async def run_codex(
             error=error,
             raw_tail=raw[-2000:],
         )
+
+
+async def run_model(
+    prompt: str,
+    *,
+    model: str = DEFAULT_MODEL,
+    effort: str = DEFAULT_EFFORT,
+    output_schema: dict | None = None,
+    timeout: float = 300.0,
+) -> CodexResult:
+    """Dispatch to codex exec or the local GGUF worker based on the slug."""
+    from .local_backend import is_local_model, run_local
+
+    if is_local_model(model):
+        return await run_local(
+            prompt,
+            model=model,
+            effort=effort,
+            output_schema=output_schema,
+            timeout=max(timeout, 900.0),
+        )
+    return await run_codex(
+        prompt,
+        model=model,
+        effort=effort,
+        output_schema=output_schema,
+        timeout=timeout,
+    )

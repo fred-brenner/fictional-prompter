@@ -13,7 +13,19 @@ from pydantic import BaseModel
 
 from .codex_backend import DEFAULT_EFFORT, DEFAULT_MODEL, MODELS
 from .evals import RUNS, RunConfig, start_run
+from .local_backend import LOCAL_MODELS, VENV_PYTHON, local_model_path, shutdown_worker
 from .prompts import PRESETS, PRESETS_BY_ID
+from .scheduling import (
+    APPROACHES,
+    DAYS,
+    EMPLOYEES,
+    PROMPT_TEXTS,
+    RULES,
+    SCHED_RUNS,
+    SENIORS,
+    SHIFTS,
+    start_sched_run,
+)
 from .testcases import TEST_CASES, TEST_CASES_BY_ID
 from .tools import TOOL_SCHEMAS
 
@@ -50,7 +62,22 @@ def bootstrap():
         "defaults": {"model": DEFAULT_MODEL, "effort": DEFAULT_EFFORT},
         "models": MODELS,
         "codex": _codex_status(),
+        "local": {
+            "available": VENV_PYTHON.exists()
+            and any(
+                (p := local_model_path(s)) is not None and p.exists()
+                for s in LOCAL_MODELS
+            ),
+            "models": {
+                s: str(local_model_path(s)) for s in LOCAL_MODELS
+            },
+        },
     }
+
+
+@app.on_event("shutdown")
+def _shutdown():
+    shutdown_worker()
 
 
 class RunRequest(BaseModel):
@@ -58,8 +85,8 @@ class RunRequest(BaseModel):
     label: str = "custom prompt"
     model: str = DEFAULT_MODEL
     effort: str = DEFAULT_EFFORT
-    judge_model: str | None = None
-    judge_effort: str = "low"
+    judge_model: str | None = "gpt-6-luna"
+    judge_effort: str = "medium"
     tools_enabled: bool = True
     stop_sequences: list[str] = []
     case_ids: list[str] | None = None
@@ -101,3 +128,59 @@ def get_preset(preset_id: str):
     if not preset:
         raise HTTPException(404, "preset not found")
     return preset
+
+
+# ----------------------------------------------------------- scheduler lab
+
+
+@app.get("/api/sched/bootstrap")
+def sched_bootstrap():
+    return {
+        "employees": [
+            {"name": n, "days": d, "senior": n in SENIORS}
+            for n, d in EMPLOYEES.items()
+        ],
+        "days": DAYS,
+        "shifts": SHIFTS,
+        "rules": RULES,
+        "approaches": APPROACHES,
+        "prompt_texts": PROMPT_TEXTS,
+        "codex": _codex_status(),
+    }
+
+
+class SchedRunRequest(BaseModel):
+    approach_id: str
+    trials: int = 3
+    soft_constraints: str = ""
+    model: str | None = None
+    effort: str | None = None
+    prompt_override: str | None = None
+
+
+@app.post("/api/sched/run")
+async def sched_create_run(req: SchedRunRequest):
+    if req.approach_id not in {a["id"] for a in APPROACHES}:
+        raise HTTPException(400, f"unknown approach: {req.approach_id}")
+    run = start_sched_run(
+        req.approach_id,
+        req.trials,
+        req.soft_constraints,
+        model=req.model,
+        effort=req.effort,
+        prompt_override=req.prompt_override,
+    )
+    return {"run_id": run.id}
+
+
+@app.get("/api/sched/runs")
+def sched_list_runs():
+    return [r.summary() for r in sorted(SCHED_RUNS.values(), key=lambda r: r.created_at)]
+
+
+@app.get("/api/sched/run/{run_id}")
+def sched_get_run(run_id: str):
+    run = SCHED_RUNS.get(run_id)
+    if not run:
+        raise HTTPException(404, "run not found")
+    return run.detail()
